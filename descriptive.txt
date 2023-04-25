@@ -1,0 +1,108 @@
+DESCRIPTIVE STATS
+
+
+import pandas as pd
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+
+
+
+df = pd.read_csv('uber.csv')
+
+
+df.head()
+
+
+df.fare_amount.median()
+
+
+df.fare_amount.mean()
+print(f"The mean of the fares column is: {round(df.fare_amount.mean(),3)}")
+print(f"The mean of the passenger count column is: {round(df.passenger_count.mean(),3)}")
+
+
+df.fare_amount.median()
+print(f"The mean of the fares column is: {round(df.fare_amount.median(),3)}")
+print(f"The mean of the passenger count column is: {round(df.passenger_count.median(),3)}")
+
+
+df.fare_amount.mode()
+print(f"The mode of the fares column is: {round(df.fare_amount.mode()[0],3)}")
+print(f"The mode of the passenger count column is: {round(df.passenger_count.mode()[0],3)}")
+
+
+df.fare_amount.min()
+print(f"The min of the fares column is: {round(df.fare_amount.min(),3)}")
+print(f"The max of the passenger count column is: {round(df.passenger_count.max(),3)}")
+print(f"The sum of the fares column is: {round(df.fare_amount.sum(),3)}")
+
+
+#for IQR and all
+df.describe()
+
+
+df.fare_amount.std()
+print(f"The std of the fares column is: {round(df.fare_amount.std(),3)}")
+print(f"The var of the passenger count column is: {round(df.passenger_count.var(),3)}")
+
+
+df.fare_amount.corr(df.passenger_count)
+
+
+semFares = stats.sem(df["fare_amount"])
+print("Standard Error of Mean of Fares: ", round(semFares,3))
+semPassengers = stats.sem(df["passenger_count"])
+print("Standard Error of Mean of Number of Passengers: ", round(semPassengers,3))
+
+
+df.isnull().sum()
+
+
+# Coeff of Variation
+(df.column_name.std / df.column_name.mean) * 100
+
+
+df.count()
+
+
+cpFares = 100 * (df['fare_amount'].cumsum()/df['fare_amount'].sum())
+print("Cumulative Percentage of Fares: ", cpFares)
+
+
+tmFares = stats.trim_mean(df["fare_amount"], 0.1)
+print("Trimmed mean (0.1) of Fares is: ", tmFares)
+
+
+ssFares = 0
+ssPass = 0
+for i in range (len(df['fare_amount'])):
+fare = df["fare_amount"][i]
+ssFares += (fare*fare)
+nPass = df["passenger_count"][i]
+ssPass += (nPass*nPass)
+print("Sum of Square of fares is: ",ssFares)
+print("Sum of Square of number of passengers is: ",ssPass)
+
+
+
+df.skew()
+df.kurtosis()
+
+
+df.boxplot(by="passenger_count", column="fare_amount",grid=False)
+
+
+plt.scatter(df["fare_amount"], df["passenger_count"])
+
+
+df.corr()
+
+
+f = plt.figure()
+plt.matshow(df.corr(), fignum=f.number)
+plt.xticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14, rotation=45)
+plt.yticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14)
+cb = plt.colorbar()
+cb.ax.tick_params(labelsize=14)
+plt.title('Correlation Matrix', fontsize=16)

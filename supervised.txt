@@ -1,0 +1,110 @@
+SUPERVISED Models - Performance Metrics
+
+
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, mean_absolute_percentage_error, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay
+
+import math
+import matplotlib.pyplot as plt
+
+
+
+df = pd.read_csv('UberEdited.csv')
+df.head()
+
+
+df = df.drop(columns=['index','Unumber','key','pickup_datetime','distance_range'])
+
+medianFare = np.median(df["fare_amount"])
+print(medianFare)
+
+
+FareBucket = []
+for amount in df["fare_amount"]:
+if amount > 8.5:
+FareBucket.append("1")
+else:
+FareBucket.append("0")
+df["FareBucket"] = FareBucket
+
+df.drop(columns="fare_amount")
+
+
+training_data = df.sample(frac=0.67, random_state=25)
+testing_data = df.drop(training_data.index)
+print(f"No. of training examples: {training_data.shape[0]}")
+print(f"No. of testing examples: {testing_data.shape[0]}")
+
+
+def load_train_data():
+y_train = training_data['FareBucket']
+X_train = training_data.drop(columns='FareBucket')
+X_train = X_train.astype(int)
+y_train = y_train.astype(int)
+return X_train, y_train
+def load_test_data():
+y_test = testing_data['FareBucket']
+X_test = testing_data.drop(columns='FareBucket')
+X_test = X_test.astype(int)
+y_test = y_test.astype(int)
+return X_test, y_test
+
+X_train, y_train = load_train_data()
+X_test, y_test = load_test_data()
+
+df.isnull().sum()
+
+
+rfc = RandomForestClassifier()
+y_pred = rfc.fit(X_train, y_train)
+y_pred = rfc.predict(X_test)
+
+print(classification_report(y_test, y_pred, target_names=["high", "low"]))
+
+
+cm = confusion_matrix(y_test,y_pred)
+cmDisply = ConfusionMatrixDisplay(cm)
+cmDisply.plot()
+plt.figure(figsize=(0.1,0.1))
+plt.show()
+
+
+MSE = np.square(np.subtract(y_test,y_pred)).mean()
+RMSE = math.sqrt(MSE)
+print("Root Mean Square Error: ", RMSE)
+print("Mean Absolute Percentage Error: ",mean_absolute_percentage_error(y_test,y_pred))
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+# Calculate precision
+precision = precision_score(y_test, y_pred, pos_label=0)
+print("Precision:", precision)
+# Calculate error rate error_rate = 1 - accuracy print("Error rate:", error_rate)
+# Calculate sensitivity
+sensitivity = recall_score(y_test, y_pred, pos_label=0)
+print("Sensitivity:", sensitivity)
+# Calculate specificity
+tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+specificity = tn / (tn+fp)
+print("Specificity:", specificity)
+# Calculate ROC AUC
+roc_auc = roc_auc_score(y_test, y_pred)
+print("ROC AUC:", roc_auc)
+# Calculate F1 score
+f1 = f1_score(y_test, y_pred, pos_label=0)
+print("F1 score:", f1)
+
+
+fpr=fp/(fp+tn)
+tpr=tp/(tp+fn)
+plt.plot(fpr, tpr, color='darkorange', label='ROC curve (area = %0.2f)' %roc_auc)
+plt.rcParams["figure.figsize"] = (20,10)
+plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic')
+plt.legend(loc="lower right")
+plt.show()

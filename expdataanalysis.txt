@@ -1,0 +1,88 @@
+EDA
+
+
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+import plotly.express as px
+
+
+
+df = pd.read_csv("uberEdited.csv")
+
+
+df.head()
+
+# Scatter plot
+plt.xlabel("distance")
+plt.ylabel("fare_amount")
+plt.scatter(df['distance'], df['fare_amount'], c ="blue")
+
+# Scatter Matrix
+pd.plotting.scatter_matrix(df)
+
+
+
+#Quartile
+x2=df['fare_amount']
+x4=df['distance']
+data = pd.DataFrame({ "fare_amount": x2,"distance": x4})
+# Plot the dataframe
+ax = data[[ 'distance','fare_amount']].plot(kind='box', title='boxplot')
+
+# Boxplot
+df.boxplot('column1', 'column2')
+
+#Distribution Chart / Distplot
+plt.figure(figsize=[15,4])
+sns.histplot(data=df, x="column_name"
+, bins=40, kde=True)
+
+#JoinPlot
+sns.jointplot(x ='distance', y ='fare_amount', data = df)
+
+# Histogram
+df['passenger_count'].hist()
+plt.show()
+
+#Pie Chart
+plt.pie(df.coumn_name.value_counts(),labels=df.column_name.unique(),autopct ='% 1.1f %%')
+plt.pie(values,labels=lst)
+plt.show()
+
+#Line Chart
+fig = px.line(df1, x="distance_range", y="fare_amount",color='passenger_count')
+fig.show()
+
+#Bubble Chart
+fig = px.scatter(df, x="distance_range", y="fare_amount", size="distance",color="passenger_count", log_x=True, size_max=60)
+fig.show()
+
+#Density Chart
+df['passenger_count'].plot.density(color='green')
+plt.title('Density plot for passenger count')
+plt.show()
+
+#Parallel Chart
+df1 =df.sample(n=1000)
+fig = px.parallel_coordinates(df1, color="passenger_count",
+dimensions=['distance_range','fare_amount',],
+color_continuous_scale=px.colors.diverging.Tealrose,
+color_continuous_midpoint=2)
+fig.show()
+
+# Creating Andrews curves
+df1 = df[['distance','passenger_count','fare_amount']]
+df1=df1.sample(n=100)
+x = pd.plotting.andrews_curves(df1,'passenger_count')
+x.plot()
+plt.show()
+
+# Heatmap
+df_numeric = df.select_dtypes(include=np.number)
+corr = df_numeric_corr
+hm = sns.heatmap(corr, cmap="Blues", annot=True)
+plt.show()

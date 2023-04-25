@@ -1,0 +1,61 @@
+UNSUPERVISED Models - Performance Metrics
+
+
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+
+
+df = pd.read_csv('UberEdited.csv')
+df.head()
+
+
+df = df.drop(columns=['index','Unumber','key','pickup_datetime','distance_range'])
+
+target = df.fare_amount
+
+# Specify the number of clusters
+n_clusters = 2
+# Initialize the Means object
+kmeans = KMeans(n_clusters=n_clusters)
+# Fit the KMeans object to the data
+kmeans.fit(df)
+# Get the cluster labels and centroids
+labels = kmeans.labels_
+centroids = kmeans.cluster_centers_
+
+fig = plt.figure()
+ax = fig.add_subplot (111, projection='3d')
+# Plot the data points
+ax.scatter (df.fare_amount, df.distance, df.passenger_count, marker='x', c='b')
+# Set the axis labels
+ax.set_xlabel('fare_amount')
+ax.set_ylabel ('distance')
+ax.set_zlabel ('passenger_count')
+# Set the title
+plt.title("3D Scatter Plot")
+# Show the plot
+plt.show ()
+
+
+EXTRINSIC MEASURES
+
+
+from sklearn.metrics.cluster import adjusted_rand_score
+labels_true = target.values
+labels_pred = labels
+print(adjusted_rand_score(labels_true, labels_pred))
+
+
+from sklearn.metrics import mutual_info_score
+print(mutual_info_score (labels_true, labels_pred))
+
+
+INTRINSIC MEASURES
+
+
+from sklearn.metrics import silhouette_score
+print(silhouette_score(df, labels))

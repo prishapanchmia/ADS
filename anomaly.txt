@@ -1,0 +1,63 @@
+ANOMALY DETECTION
+
+
+import pandas as pd
+import numpy as np
+from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import NearestNeighbors
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+df = pd.read_csv('UberEdited.csv').head(500)
+
+df.head()
+
+
+df = df.drop(columns=['index','Unumber','key'])
+df.head()
+
+
+# Create a scatterplot of High vs Low
+plt.scatter(df['fare_amount'], df['distance'])
+plt.title('Uber Fares: Fare Amount vs Distance')
+plt.xlabel('Fare Amount')
+plt.ylabel('Distance')
+plt.show()
+
+
+DBSCAN
+# Scale the data using standardization
+scaler = StandardScaler()
+X = scaler.fit_transform(df[['fare_amount', 'distance']])
+# Apply DBSCAN with eps=0.5 and min_samples=5
+db = DBSCAN(eps=0.25, min_samples=5).fit(X)
+# Identify outliers based on their cluster label (-1 indicates an outlier)
+outliers = df[db.labels_ == -1]
+# Print the outliers count
+print(outliers.count())
+
+
+print(outliers[['fare_amount','distance']])
+
+
+KNN
+# Define the number of neighbors to consider
+k = 5
+# Fit the K-NN model on the High, Low, Open, Close, and Adj Close columns
+X = df[['fare_amount', 'distance']]
+nbrs = NearestNeighbors(n_neighbors=k+1, algorithm='ball_tree').fit(X)
+distances, indices = nbrs.kneighbors(X)
+# Calculate the average distance to the k nearest neighbors for each data point
+avg_distances = distances[:,1:].mean(axis=1)
+# Set a threshold for outlier detection (e.g. 2 standard deviations above the mean)
+threshold = avg_distances.mean() + 2 * avg_distances.std()
+# Identify outliers based on the threshold
+outliers = df[avg_distances > threshold]
+# Print the outliers count
+print(outliers.count())
+
+
+print(outliers[['fare_amount','distance']])
+

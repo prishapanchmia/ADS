@@ -1,0 +1,124 @@
+INFERENTIAL STATS
+
+
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+from scipy.stats import ttest_ind, ttest_1samp, f_oneway, shapiro
+from statsmodels.stats.weightstats import ztest
+
+
+
+df = pd.read_csv('UberEdited.csv').head(500)
+
+
+
+# Z-test
+sample_mean = df['fare_amount'].mean()
+pop_mean = 7 # assumed population mean
+sample_std = df['fare_amount'].std()
+n = len(df)
+z_score = (sample_mean - pop_mean) / (sample_std / np.sqrt(n))
+p_value = stats.norm.sf(abs(z_score)) * 2 # two-tailed test
+print('Z-score:', z_score)
+print('P-value:', p_value)
+
+
+# T-test
+sample_mean = df['fare_amount'].mean()
+pop_mean = 7 # assumed population mean
+sample_std = df['fare_amount'].std()
+n = len(df)
+t_score, p_value = stats.ttest_1samp(df['fare_amount'], pop_mean)
+print('T-score:', t_score)
+print('P-value:', p_value)
+
+
+model = ols('fare_amount ~ C(passenger_count)', data=df).fit()
+anova_table = sm.stats.anova_lm(model, typ=2)
+print(anova_table)
+
+
+t_stat, p_value = ttest_1samp(df['fare_amount'], 7)
+print("1-sample t-test results:")
+print("t-statistic: ", t_stat)
+print("p-value: ", p_value)
+
+
+sample1 = df[df['passenger_count'] == 5]['fare_amount']
+sample2 = df[df['passenger_count'] == 6]['fare_amount']
+t_stat, p_value = ttest_ind(sample1, sample2)
+print("2-sample t-test results:")
+print("t-statistic: ", t_stat)
+print("p-value: ", p_value)
+
+
+group1 = df[df['passenger_count'] == 1]['fare_amount']
+group2 = df[df['passenger_count'] == 2]['fare_amount']
+group3 = df[df['passenger_count'] == 3]['fare_amount']
+f_stat, p_value = f_oneway(group1, group2, group3)
+print("ANOVA results:")
+print("f-statistic: ", f_stat)
+print("p-value: ", p_value)
+
+
+
+
+##from cheatsheet
+
+
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+from scipy.stats import ttest_ind, ttest_1samp, f_oneway
+from statsmodels.stats.weightstats import ztest
+
+# Z-test
+sample_mean = df['fare_amount'].mean()
+pop_mean = 7 # assumed population mean
+sample_std = df['fare_amount'].std()
+n = len(df)
+z_score = (sample_mean - pop_mean) / (sample_std / np.sqrt(n))
+p_value = stats.norm.sf(abs(z_score)) * 2 # two-tailed test
+print('Z-score:', z_score)
+print('P-value:', p_value)
+
+# T-test
+sample_mean = df['fare_amount'].mean()
+pop_mean = 7 # assumed population mean
+sample_std = df['fare_amount'].std()
+n = len(df)
+t_score, p_value = stats.ttest_1samp(df['fare_amount'], pop_mean)
+print('T-score:', t_score)
+print('P-value:', p_value)
+
+model = ols('fare_amount ~ C(passenger_count)', data=df).fit()
+anova_table = sm.stats.anova_lm(model, typ=2)
+print(anova_table)
+
+# 1 Sample T-Test
+t_stat, p_value = ttest_1samp(df['fare_amount'], 7)
+print("1-sample t-test results:")
+print("t-statistic: ", t_stat)
+print("p-value: ", p_value)
+
+# 2 Sample T-Test
+sample1 = df[df['passenger_count'] == 5]['fare_amount']
+sample2 = df[df['passenger_count'] == 6]['fare_amount']
+t_stat, p_value = ttest_ind(sample1, sample2)
+print("2-sample t-test results:")
+print("t-statistic: ", t_stat)
+print("p-value: ", p_value)
+
+# ANOVA
+group1 = df[df['passenger_count'] == 1]['fare_amount']
+group2 = df[df['passenger_count'] == 2]['fare_amount']
+group3 = df[df['passenger_count'] == 3]['fare_amount']
+f_stat, p_value = f_oneway(group1, group2, group3)
+print("ANOVA results:")
+print("f-statistic: ", f_stat)
+print("p-value: ", p_value)
